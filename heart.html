@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff758c">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Way To My Heart ❤️</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  background:linear-gradient(135deg,#ff758c,#ff7eb3);
+  overflow:hidden;
+  font-family:'Segoe UI',sans-serif;
+  color:white;
+  opacity:0;
+  animation:fadeIn 1s ease forwards;
+  transition:transform 4s ease;
+}
+@keyframes fadeIn{to{opacity:1;}}
+
+#stars{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+.center-text{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:5;
+}
+
+.bg-heart{
+  position:absolute;
+  font-size:160px;
+  opacity:1.5;
+  transition:transform 0.15s ease, opacity 0.15s ease;
+}
+
+.name-box{
+  background:rgba(255,255,255,0.18);
+  padding:22px 34px;
+  border-radius:22px;
+  backdrop-filter:blur(8px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  text-align:center;
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 2s ease, transform 2s ease;
+}
+.name-box.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.name{
+  font-size:26px;
+  font-weight:600;
+  letter-spacing:2px;
+}
+
+.buttons{
+  position:fixed;
+  bottom:30px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  z-index:6;
+}
+
+button{
+  padding:14px 26px;
+  border:none;
+  border-radius:30px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.yes{
+  background:white;
+  color:#ff2f68;
+  font-weight:600;
+  box-shadow:0 0 20px rgba(255,255,255,0.6);
+}
+
+.no{
+  background:#222;
+  color:white;
+  position:relative;
+}
+
+.fall{
+  position:fixed;
+  top:-30px;
+  font-size:22px;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  to{ transform:translateY(110vh); }
+}
+
+/* Floating messages */
+.message {
+  position: fixed;
+  font-size: 14px;
+  opacity: 0.3;
+  animation: floatMsg linear forwards;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index:5000;
+}
+@keyframes floatMsg {
+  0% { opacity:0; transform:translateY(30px);}
+  10% { opacity:0.3;}
+  90% { opacity:0.3;}
+  100% { opacity:0; transform:translateY(-50px);}
+}
+
+/* Proposal popup */
+#proposal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.popup{
+  background:white;
+  color:#ff2f68;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  max-width:300px;
+}
+
+#ring{
+  font-size:60px;
+  opacity:0;
+  transform:scale(0);
+  transition:all 0.8s ease;
+}
+.success-text{
+  margin-top:15px;
+  font-weight:bold;
+  color:#ff2f68;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* Next button */
+#nextQuizBtn {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px;
+  background: #ff4b81;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: none; /* hidden initially */
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  z-index:10000;
+}
+#nextQuizBtn:hover{
+  transform: translateY(-50%) scale(1.2);
+  background:#ff2f68;
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="center-text">
+  <div class="bg-heart" id="bgHeart">❤️</div>
+  <div class="name-box" id="nameBox">
+    <div id="name1" class="name"></div>
+    <div>❤️</div>
+    <div id="name2" class="name"></div>
+  </div>
+</div>
+
+<div class="buttons">
+  <button class="yes" onclick="happyYes()">LOVE YOU ❤️</button>
+  <button class="no" id="noBtn">HATE YOU 😒</button>
+</div>
+
+<audio id="loveSong">
+  <source src="assets/song.mpeg" type="audio/mpeg">
+</audio>
+
+<div id="proposal">
+  <div class="popup">
+    <h2>Will You Be Mine Forever? 💍</h2>
+    <div id="ring">💍</div>
+    <br>
+    <button onclick="yesForever()">YES 💖</button>
+    <div class="success-text" id="successText">Engagement Confirmed ❤️✨</div>
+  </div>
+</div>
+
+<!-- Next button to quiz -->
+<a href="quiz.html" id="nextQuizBtn">➡️</a>
+
+<script>
+// SERVICE WORKER
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
+
+// Starry background
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars=[];
+for(let i=0;i<150;i++){
+  stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5});
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+const firstName="RAMAIAHGARI THARUN";
+const secondName="RAMAIAHGARI MAHIMA";
+
+// Floating messages
+const messagesArr=[
+  "I ❤️ you","You make me smile","My heart beats for you","MAHIMA 🌹 THARUN",
+  "Forever & Always","You are my joy","Love you more","You are my everything","😘💕","💖💞"
+];
+let msgInterval;
+
+function startMessagePopups(){
+  msgInterval = setInterval(()=>{
+    const msg=document.createElement("div");
+    msg.className="message";
+    msg.innerText=messagesArr[Math.floor(Math.random()*messagesArr.length)];
+    msg.style.left=Math.random()*90+"vw";
+    msg.style.top=Math.random()*80+"vh";
+    msg.style.fontSize=(12+Math.random()*8)+"px";
+    msg.style.animationDuration=(4+Math.random()*4)+"s";
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),8000);
+  },200);
+}
+function stopMessagePopups(){ clearInterval(msgInterval); }
+
+function happyYes(){
+  const song=document.getElementById("loveSong");
+  song.play();
+  document.getElementById("nameBox").classList.add("show");
+  typeWriter("name1",firstName,()=>{ setTimeout(()=>typeWriter("name2",secondName),600); });
+  
+  // Start messages while song plays
+  startMessagePopups();
+
+  song.onended=()=>{
+    stopMessagePopups();
+    fireworks();
+    confetti();
+    document.getElementById("proposal").style.display="flex";
+    document.getElementById("nextQuizBtn").style.display="flex"; // show next button
+  };
+}
+
+function typeWriter(id,text,callback){
+  let i=0;
+  const el=document.getElementById(id);
+  el.innerHTML="";
+  const t=setInterval(()=>{
+    el.innerHTML+=text.charAt(i);
+    i++;
+    if(i>=text.length){ clearInterval(t); if(callback) callback(); }
+  },150);
+}
+
+function confetti(){
+  for(let i=0;i<80;i++){
+    const c=document.createElement("div");
+    c.className="fall";
+    c.innerText=["🎉","💖","✨","🌹"][Math.floor(Math.random()*4)];
+    c.style.left=Math.random()*100+"vw";
+    c.style.animationDuration=(2+Math.random()*3)+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),5000);
+  }
+}
+
+function fireworks(){
+  for(let i=0;i<40;i++){
+    setTimeout(()=>{
+      const f=document.createElement("div");
+      f.style.position="fixed";
+      f.style.left=Math.random()*100+"vw";
+      f.style.top=Math.random()*80+"vh";
+      f.style.fontSize="30px";
+      f.innerText="🎆";
+      f.style.transition="transform 1s ease, opacity 1s";
+      document.body.appendChild(f);
+      setTimeout(()=>{ f.style.transform="scale(2)"; f.style.opacity="0"; },50);
+      setTimeout(()=>f.remove(),1000);
+    },i*100);
+  }
+}
+
+function yesForever(){
+  const ring=document.getElementById("ring");
+  const success=document.getElementById("successText");
+  ring.style.opacity="1";
+  ring.style.transform="scale(2) rotate(360deg)";
+  document.body.style.transform="scale(1.1)";
+  setTimeout(()=>{ success.style.opacity="1"; },800);
+}
+
+// Dodge NO button
+const noBtn=document.getElementById("noBtn");
+function dodge(){
+  const x=Math.random()*120-60;
+  const y=Math.random()*80-40;
+  noBtn.style.transform=`translate(${x}px,${y}px)`;
+}
+noBtn.addEventListener("mouseenter",dodge);
+noBtn.addEventListener("touchstart",dodge);
+
+</script>
+</body>
+</html>

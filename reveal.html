@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff758c">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Letter ❤️</title>
+
+<style>
+/* BODY & CONTAINER */
+body{
+  margin:0;
+  height:100vh;
+  background: linear-gradient(135deg,#ff758c,#ff7eb3);
+  font-family:'Segoe UI',sans-serif;
+  color:white;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* CONTAINER */
+.container{
+  width:90%;
+  max-width:500px;
+  text-align:center;
+  position:relative;
+  z-index:2;
+}
+
+/* BACKGROUND HEART */
+.bg-heart{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:180px;
+  opacity:0.15;
+  transition:transform 0.15s ease, opacity 0.15s ease;
+  z-index:1;
+}
+
+/* LETTER BOX */
+.letter-box{
+  background: rgba(255,255,255,0.18);
+  padding:25px 30px;
+  border-radius:22px;
+  backdrop-filter: blur(8px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  display:inline-block;
+  z-index:2;
+  max-height:70vh;
+  overflow-y:auto;
+}
+
+/* LETTER TEXT */
+.letter-text{
+  font-size:18px;
+  line-height:1.6;
+  text-align:left;
+  color:#fff8f5;
+  white-space:pre-wrap;
+  display:none;
+}
+
+/* BUTTON STYLE */
+button{
+  margin-top:25px;
+  padding:12px 30px;
+  border:none;
+  border-radius:25px;
+  background:white;
+  color:#ff2f68;
+  font-weight:600;
+  cursor:pointer;
+  font-size:16px;
+  transition: transform 0.2s;
+}
+button:active{
+  transform: scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND HEART -->
+<div class="bg-heart">❤️</div>
+
+<div class="container">
+  <div class="letter-box">
+
+    <!-- START BUTTON -->
+    <button id="startBtn">Start ❤️</button>
+
+    <!-- LETTER -->
+    <div id="letter" class="letter-text"></div>
+
+    <!-- CONTINUE BUTTON (Same as old) -->
+    <button id="continueBtn" onclick="goNext()" style="display:none;">
+      Continue
+    </button>
+
+  </div>
+</div>
+
+<!-- LOVE SONG -->
+<audio id="loveSong" preload="auto">
+  <source src="assets/song2.mpeg" type="audio/mpeg">
+</audio>
+
+<script>
+
+// ===== SERVICE WORKER REGISTER (SAFE) =====
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+
+// ===== PRIVATE ACCESS CHECK =====
+if(localStorage.getItem("loggedIn") !== "true"){
+    alert("Please login first ❤️");
+    window.location.href = "index.html";
+}
+
+// ===== LOVE LETTER CONTENT =====
+const letterContent = `My Dear Milky,
+
+Nee hrudayam lo chinna chotu kaavali ani kaadu,
+akkada okkadine undaali ani korukuntunna...
+
+Nee premani share cheyyalanukonu,
+endukante nee prema naa okkadike kaabatti....
+Nee choopu kosam poti padalanukonu.
+endukante nee choopulu naa kosame kaabatti....
+
+Nee hrudayam lo,
+naa kosame chotu undaali,
+naa okkadi kosam maatrame....
+
+Nuvvu navvithe,
+aa navvuku karanam nene kaavali....
+Nuvvu prema gurinchi alochisthe,
+nee manasulo vacche peru
+naa peru maatrame kaavali....
+
+Nee cheyyi pattukovadaaniki nenu thappa,
+verevvaru undakudadhu....
+Nee hrudayaanni thaakadaniki nenu thappa,
+verevvaru undakudadhu....
+
+Nee hrudayam lo prathi chappudu,
+naa peru palakali....
+Nee kalalanni
+naatho modalu petti naathoney mugavali....
+
+This is not my request,
+this is my order...
+
+Nuvvu naa dhaanivi.
+Nuvvu naa okkadike sontham...
+
+Only you for me, only me for you — forever ours, forever true.`;
+
+// ===== VARIABLES =====
+let charIndex = 0;
+const letterEl = document.getElementById("letter");
+const song = document.getElementById("loveSong");
+const bgHeart = document.querySelector(".bg-heart");
+const startBtn = document.getElementById("startBtn");
+const continueBtn = document.getElementById("continueBtn");
+
+// ===== TYPEWRITER =====
+function typeLetter(){
+    charIndex = 0;
+    letterEl.innerHTML = "";
+
+    function type(){
+        if(charIndex < letterContent.length){
+            letterEl.innerHTML += letterContent.charAt(charIndex);
+            charIndex++;
+            setTimeout(type, 40);
+        }
+    }
+    type();
+}
+
+// ===== HEART PULSE ANIMATION =====
+function pulseHeart(){
+    let scale = 1;
+    setInterval(()=>{
+        scale = scale === 1 ? 1.1 : 1;
+        bgHeart.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        bgHeart.style.opacity = scale === 1.1 ? "0.25" : "0.15";
+    }, 800);
+}
+
+// ===== CONTINUE =====
+function goNext(){
+  window.location.href="video.html";
+}
+
+// ===== START BUTTON =====
+startBtn.addEventListener("click", function(){
+
+    startBtn.style.display = "none";
+    letterEl.style.display = "block";
+    continueBtn.style.display = "inline-block";
+
+    song.play().catch(()=>{});
+    typeLetter();
+    pulseHeart();
+});
+</script>
+
+</script>
+
+</body>
+</html>

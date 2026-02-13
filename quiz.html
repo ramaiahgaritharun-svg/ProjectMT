@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOVE YOU ❤️</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff758c">
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg,#ff758c,#ff7eb3);
+  color: white;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Floating Hearts */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  font-size: 20px;
+  animation: float 6s linear infinite;
+  opacity: 0.7;
+}
+@keyframes float {
+  0% { transform: translateY(0) scale(1); opacity:1; }
+  100% { transform: translateY(-110vh) scale(1.5); opacity:0; }
+}
+
+/* Typing Text */
+.typing {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  height: 30px;
+  overflow: hidden;
+  border-right: 2px solid white;
+  white-space: nowrap;
+  animation: blink 0.7s infinite;
+}
+@keyframes blink { 50% { border-color: transparent; } }
+
+/* Glowing Form Container */
+.container {
+  max-width: 500px;
+  margin: 50px auto;
+  background: rgba(255,255,255,0.1);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px #ff4b81, 0 0 40px #ff2f68;
+  animation: glow 2s infinite alternate;
+  position: relative;
+}
+@keyframes glow { from { box-shadow: 0 0 10px #ff4b81; } to { box-shadow: 0 0 25px #ff2f68; } }
+
+h1 { text-align: center; margin-bottom: 20px; }
+label { display: block; margin-top: 15px; font-weight: 600; }
+input, textarea { width: 100%; padding: 10px; border-radius: 12px; border: none; margin-top: 5px; color: #000; }
+button { margin-top: 20px; width: 100%; padding: 14px; font-size: 16px; background: #ff4b81; border: none; border-radius: 30px; color: white; cursor: pointer; transition: 0.3s; }
+button:hover { background: #ff2f68; }
+
+#thankYouMessage { display: none; text-align: center; margin-top: 50px; font-size: 28px; font-weight: 600; }
+
+/* Next button */
+.nextBtn {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px;
+  background: #ff4b81;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  z-index: 1000;
+  display: none; /* hidden until song ends */
+}
+.nextBtn:hover { transform: translateY(-50%) scale(1.2); background: #ff2f68; }
+
+/* Message Rain */
+.message {
+  position: fixed;
+  font-size: 14px;
+  opacity: 0.3;
+  animation: floatMsg linear forwards;
+  white-space: nowrap;
+}
+@keyframes floatMsg { 0%{ opacity:0; transform:translateY(30px);} 10%{opacity:1;} 90%{opacity:1;} 100%{opacity:0; transform:translateY(-50px);} }
+</style>
+</head>
+
+<body>
+
+<!-- Background Music -->
+<audio id="bgMusic" autoplay loop>
+  <source src="assets/song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Floating Hearts + Typing -->
+<div class="typing" id="typingText"></div>
+
+<div class="container">
+  <h1>❤️ Just For You ❤️</h1>
+  <form id="quizForm">
+    <label>Recipient Email:</label>
+    <input type="email" id="recipientEmail" required>
+    <label>1. How does this website make you feel?</label>
+    <textarea id="siteFeeling" required></textarea>
+    <label>2. How do you feel about me?</label>
+    <textarea id="feeling" required></textarea>
+    <label>3. Favorite part?</label>
+    <input type="text" id="favoritePart" required>
+    <label>4. One emoji?</label>
+    <input type="text" id="emoji" required>
+    <label>5. Would you give me a kiss? 💋</label>
+    <input type="text" id="kiss" required>
+    <label>6. Message for me:</label>
+    <textarea id="message" required></textarea>
+    <label>7. Love rating (1-10):</label>
+    <input type="text" id="loveRating" required>
+    <button type="submit">Submit ❤️</button>
+  </form>
+  <div id="thankYouMessage">I Love You Forever ❤️</div>
+</div>
+
+<!-- Next Button -->
+<a href="quiz.html" class="nextBtn">➡️</a>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+emailjs.init("QLG7eiDJ910j5FqKL");
+
+// Background Music
+const music = document.getElementById("bgMusic");
+document.addEventListener("click", ()=>music.play(), {once:true});
+
+// Floating Hearts
+setInterval(() => {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "💖";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (15 + Math.random()*20) + "px";
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+}, 400);
+
+// Typing Effect
+const text = "You are my favorite notification ❤️";
+let index = 0;
+function typeEffect() {
+  if(index<text.length){
+    document.getElementById("typingText").innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeEffect, 80);
+  }
+}
+typeEffect();
+
+// Message Rain
+let msgInterval;
+function startMessages() {
+  const messages = ["I ❤️ you","You are special","💖💖💖","🌹🌹🌹","😍","You make me smile","My heart is yours"];
+  msgInterval = setInterval(()=>{
+    const m = document.createElement("div");
+    m.className="message";
+    m.innerText = messages[Math.floor(Math.random()*messages.length)];
+    m.style.left = Math.random()*100+"vw";
+    m.style.top = Math.random()*90+"vh";
+    m.style.fontSize = (10+Math.random()*14)+"px";
+    m.style.animationDuration = (4+Math.random()*4)+"s";
+    document.body.appendChild(m);
+    setTimeout(()=>m.remove(),8000);
+  }, 180);
+}
+
+// On Submit
+document.getElementById("quizForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  // Stop music
+  music.pause();
+  music.currentTime=0;
+
+  // Stop messages
+  clearInterval(msgInterval);
+
+  // Send Email
+  const templateParams = {
+    to_email: document.getElementById("recipientEmail").value,
+    siteFeeling: document.getElementById("siteFeeling").value,
+    feeling: document.getElementById("feeling").value,
+    favoritePart: document.getElementById("favoritePart").value,
+    emoji: document.getElementById("emoji").value,
+    kiss: document.getElementById("kiss").value,
+    message: document.getElementById("message").value,
+    loveRating: document.getElementById("loveRating").value
+  };
+
+  emailjs.send('service_wqvf68c','template_r2mycnl',templateParams)
+  .then(function(){
+    document.getElementById("quizForm").style.display="none";
+    document.getElementById("thankYouMessage").style.display="block";
+
+    // Fireworks
+    const duration = 3000;
+    const end = Date.now() + duration;
+    (function frame(){
+      confetti({particleCount:5, angle:60, spread:55, origin:{x:0}});
+      confetti({particleCount:5, angle:120, spread:55, origin:{x:1}});
+      if(Date.now()<end) requestAnimationFrame(frame);
+      else document.querySelector(".nextBtn").style.display="flex"; // show next
+    }());
+  });
+});
+
+// Start message rain immediately
+startMessages();
+</script>
+</body>
+</html>

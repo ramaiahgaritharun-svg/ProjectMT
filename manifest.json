@@ -1,0 +1,20 @@
+{
+  "name": "RMT App",
+  "short_name": "Milky",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ff758c",
+  "theme_color": "#ff758c",
+  "icons": [
+    {
+      "src": "/assets/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
