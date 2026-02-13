@@ -227,11 +227,20 @@ document.getElementById("quizForm").addEventListener("submit", function(e){
       else document.querySelector(".nextBtn").style.display="flex"; // show next
     }());
   });
-});
+}); 
+  // Register Service Worker (FIXED PATH)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("sw.js")
+      .then(reg => console.log("SW registered:", reg.scope))
+      .catch(err => console.log("SW failed:", err));
+  });
+}
 
 // Start message rain immediately
 startMessages();
 </script>
 </body>
 </html>
+
 
