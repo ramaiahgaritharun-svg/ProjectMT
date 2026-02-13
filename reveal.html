@@ -212,9 +212,18 @@ startBtn.addEventListener("click", function(){
     typeLetter();
     pulseHeart();
 });
+  // Register Service Worker (FIXED PATH)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("sw.js")
+      .then(reg => console.log("SW registered:", reg.scope))
+      .catch(err => console.log("SW failed:", err));
+  });
+}
 </script>
 
 </script>
 
 </body>
 </html>
+
